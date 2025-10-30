@@ -215,9 +215,8 @@ export default function Home() {
             className={`relative w-full ${
               isTyping 
                 ? 'absolute inset-0 pointer-events-none' 
-                : 'h-[400px] cursor-pointer hover:opacity-90'
+                : 'h-[400px] hover:opacity-90'
             }`}
-            onClick={handleParticleFieldClick}
           >
             <ParticleField
               isListening={voiceState.isListening}
@@ -225,6 +224,18 @@ export default function Home() {
               volume={voiceState.volume}
               frequency={voiceState.frequency}
             />
+            
+            {/* Orb Click Area - Circular region over the orb */}
+            {!isTyping && (
+              <div 
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full cursor-pointer z-10"
+                onClick={handleParticleFieldClick}
+                style={{ 
+                  background: 'transparent',
+                  borderRadius: '50%'
+                }}
+              />
+            )}
             
             {!isTyping && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

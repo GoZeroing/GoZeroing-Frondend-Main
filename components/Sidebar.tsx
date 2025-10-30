@@ -17,7 +17,7 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
 
   return (
     <aside 
-      className={`fixed left-0 top-0 h-screen bg-[#1a1a1a] border-r border-[#2a2a2a] flex flex-col transition-all duration-300 ease-out z-50 ${
+      className={`fixed left-0 top-0 h-screen bg-[#1a1a1a] border-r border-[#2a2a2a] transition-all duration-300 ease-out z-50 ${
         isExpanded ? 'w-[240px]' : 'w-[72px]'
       }`}
     >
@@ -27,7 +27,7 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
       </div>
 
       {/* New Chat Button */}
-      <div className="px-4 mb-5">
+      <div className="px-4 pt-20">
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -47,7 +47,7 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 w-full px-3 overflow-y-auto scrollbar-hide">
+      <nav className="w-full px-3 overflow-y-auto scrollbar-hide mt-12">
         {/* Home Button */}
         <button
           onClick={() => setShowHistory(!showHistory)}
@@ -99,12 +99,10 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
         )}
       </nav>
 
-      {/* Bottom Section */}
-      <div className="px-3 py-3 border-t border-[#2a2a2a]">
-        <div className="flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full bg-[#252525] flex items-center justify-center">
-            <User className="w-4 h-4 text-gray-400" />
-          </div>
+      {/* User Icon - back to original fixed bottom position */}
+      <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
+        <div className="w-8 h-8 rounded-full bg-[#252525] flex items-center justify-center">
+          <User className="w-4 h-4 text-gray-400" />
         </div>
       </div>
     </aside>

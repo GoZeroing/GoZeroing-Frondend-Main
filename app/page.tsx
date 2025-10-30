@@ -201,7 +201,7 @@ export default function Home() {
           }`}>
             
 
-<div className="relative z-20 w-full max-w-[640px] px-4 -mt-16">
+<div className="relative z-20 w-full max-w-[750px] px-4 -mt-16">
               <TypePanel onTyping={setIsTyping} onSubmit={handleSubmit} />
             </div>
 

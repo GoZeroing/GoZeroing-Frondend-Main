@@ -40,7 +40,7 @@ export default function TypePanel({ onTyping, onSubmit, responseMode }: TypePane
   };
 
   return (
-    <div className={responseMode ? "" : "w-full max-w-[640px] mx-auto mt-16"}>
+    <div className={responseMode ? "" : "w-full mx-auto mt-16"}>
       <div className="bg-[#1f1f1f] border border-[#404040] rounded-2xl p-3 relative backdrop-blur-sm ring-1 ring-white/10 hover:ring-white/20 transition-all duration-300">
         {/* Textarea */}
         <textarea

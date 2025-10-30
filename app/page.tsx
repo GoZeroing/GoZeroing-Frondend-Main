@@ -119,7 +119,7 @@ export default function Home() {
         currentChatId={currentChatId || undefined}
       />
 
-      <main className="flex-1 flex flex-col overflow-hidden relative">
+      <main className="flex-1 flex flex-col overflow-hidden relative pl-[72px]">
         {/* AI Response View */}
         {isResponding && (
           <div className="absolute inset-0 z-30 bg-background flex flex-col animate-in fade-in duration-500">
@@ -171,9 +171,9 @@ export default function Home() {
           </div>
         )}
 
-        <div className={`flex-1 flex flex-col z-10 transition-all duration-500 ${isResponding ? 'opacity-0 pointer-events-none scale-95' : 'opacity-100 scale-100'}`}>
+        <div className={`flex-1 flex flex-col z-10 ${isResponding ? 'opacity-0 pointer-events-none scale-95' : 'opacity-100 scale-100'}`}>
           <div 
-            className={`relative w-full transition-all duration-500 ease-in-out ${
+            className={`relative w-full ${
               isTyping 
                 ? 'absolute inset-0 pointer-events-none' 
                 : 'h-[400px] cursor-pointer hover:opacity-90'
@@ -196,7 +196,7 @@ export default function Home() {
             )}
           </div>
 
-          <div className={`flex-1 flex flex-col items-center transition-all duration-500 ${
+          <div className={`flex-1 flex flex-col items-center ${
             isTyping ? 'justify-center relative z-20' : 'justify-start pt-4'
           }`}>
             

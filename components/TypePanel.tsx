@@ -51,7 +51,8 @@ export default function TypePanel({ onTyping, onSubmit, responseMode }: TypePane
           }`}
           placeholder="Type here to start the Zeroing…"
           onKeyDown={(e) => {
-            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
               handleSubmit();
             }
           }}

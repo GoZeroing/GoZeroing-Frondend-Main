@@ -17,14 +17,9 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
 
   return (
     <aside 
-      className={`h-screen bg-[#1a1a1a] border-r border-[#2a2a2a] flex flex-col transition-all duration-300 ease-out ${
+      className={`fixed left-0 top-0 h-screen bg-[#1a1a1a] border-r border-[#2a2a2a] flex flex-col transition-all duration-300 ease-out z-50 ${
         isExpanded ? 'w-[240px]' : 'w-[72px]'
       }`}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => {
-        setIsExpanded(false);
-        setShowHistory(false);
-      }}
     >
       {/* Logo */}
       <div className="pt-5 pb-4 px-4 flex items-center justify-center">
@@ -35,8 +30,9 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
       <div className="px-4 mb-5">
         <button
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
-            onNewChat();
+            onNewChat?.();
           }}
           className="w-full h-10 flex items-center justify-center gap-2.5 px-3 rounded-lg bg-[#1f1f1f] hover:bg-[#252525] text-gray-400 hover:text-white transition-all duration-200 group border border-[#2a2a2a] hover:border-[#333333]"
           aria-label="New chat"
@@ -55,12 +51,17 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
         {/* Home Button */}
         <button
           onClick={() => setShowHistory(!showHistory)}
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-gray-400 hover:text-gray-200 hover:bg-[#252525] transition-all duration-200 group"
+          onMouseEnter={() => setIsExpanded(true)}
+          onMouseLeave={() => {
+            setIsExpanded(false);
+            setShowHistory(false);
+          }}
+          className="w-full flex items-center justify-center gap-2.5 px-2.5 py-2 rounded-md text-gray-400 hover:text-gray-200 hover:bg-[#252525] transition-all duration-200 group"
         >
           <Home className="w-4 h-4 flex-shrink-0" />
           {isExpanded && (
             <>
-              <span className="text-sm font-medium flex-1 text-left whitespace-nowrap">Home</span>
+              <span className="text-sm font-medium flex-1 text-center whitespace-nowrap">Home</span>
               <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 text-gray-500 ${
                 showHistory ? 'rotate-90' : ''
               }`} />

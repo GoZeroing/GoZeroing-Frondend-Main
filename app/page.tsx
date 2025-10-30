@@ -133,7 +133,7 @@ export default function Home() {
           {isConnected ? (
             <>
               Go Zeroing
-              <span className="inline-block w-0.5 h-6 bg-white/70 ml-1 animate-pulse"></span>
+              {voiceState.isListening && <span className="inline-block w-0.5 h-6 bg-white/70 ml-1 animate-pulse"></span>}
             </>
           ) : (
             <>

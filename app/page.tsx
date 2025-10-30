@@ -30,6 +30,7 @@ export default function Home() {
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [isVoiceActive, setIsVoiceActive] = useState(false);
 
   const audioRefs = useAudioSetup();
   const { voiceState, toggleListening } = useVoiceRecognition(audioRefs);
@@ -53,8 +54,10 @@ export default function Home() {
     if (!isTyping && !isResponding) {
       if (!voiceState.isListening) {
         toggleListening();
+        setIsVoiceActive(true);
       } else {
         toggleListening();
+        setIsVoiceActive(false);
       }
     }
   }
@@ -66,6 +69,7 @@ export default function Home() {
     setIsResponding(true);
     setIsStreaming(true);
     setAiResponse('');
+    setIsVoiceActive(false); // Reset voice active state
 
     // Simulate AI streaming response
     const fullResponse = "I understand your question. Let me analyze this carefully. Based on the information available, here's what I can tell you: This is a comprehensive response that demonstrates the streaming capability similar to Perplexity AI. The system processes your query, searches through relevant information, and provides a detailed, thoughtful answer in real-time. This creates an engaging user experience where you can see the AI 'thinking' and formulating its response progressively.";
@@ -246,12 +250,21 @@ export default function Home() {
             )}
           </div>
 
-          <div className={`flex-1 flex flex-col items-center ${
+          <div className={`flex-1 flex flex-col items-center transition-all duration-700 ease-out ${
             isTyping ? 'justify-center relative z-20' : 'justify-start pt-4'
           }`}>
             
+            {/* Voice Active Message */}
+            {isVoiceActive && !isResponding && (
+              <div className="text-center mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                <p className="text-gray-400 text-lg font-medium">Listening...</p>
+                <p className="text-gray-500 text-sm mt-2">Speak your question</p>
+              </div>
+            )}
 
-<div className="relative z-20 w-full max-w-[750px] px-4 -mt-16">
+            <div className={`relative z-20 w-full max-w-[750px] px-4 transition-all duration-700 ease-out ${
+              isVoiceActive ? 'translate-y-32' : '-mt-16'
+            }`}>
               <TypePanel onTyping={setIsTyping} onSubmit={handleSubmit} />
             </div>
 

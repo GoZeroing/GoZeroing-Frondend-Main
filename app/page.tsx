@@ -250,22 +250,42 @@ export default function Home() {
             )}
           </div>
 
-          <div className={`flex-1 flex flex-col items-center transition-all duration-700 ease-out ${
-            isTyping ? 'justify-center relative z-20' : 'justify-start pt-4'
-          }`}>
+          <div 
+            className={`flex-1 flex flex-col items-center ${
+              isTyping ? 'justify-center relative z-20' : 'justify-start pt-4'
+            }`}
+            style={{
+              transition: 'all 1.2s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+          >
             
             {/* Voice Active Message */}
             {isVoiceActive && !isResponding && (
-              <div className="text-center mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+              <div 
+                className="text-center mb-8"
+                style={{
+                  animation: 'fadeInSlideDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both'
+                }}
+              >
                 <p className="text-gray-400 text-lg font-medium">Listening...</p>
                 <p className="text-gray-500 text-sm mt-2">Speak your question</p>
               </div>
             )}
 
-            <div className={`relative z-20 w-full max-w-[750px] px-4 transition-all duration-700 ease-out ${
-              isVoiceActive ? 'translate-y-32' : '-mt-16'
-            }`}>
-              <TypePanel onTyping={setIsTyping} onSubmit={handleSubmit} />
+            <div 
+              className={`relative z-20 w-full max-w-[750px] px-4 ${
+                isVoiceActive ? 'translate-y-64' : '-mt-16'
+              }`}
+              style={{
+                transition: 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                transitionDelay: isVoiceActive ? '0.1s' : '0s'
+              }}
+            >
+              <TypePanel 
+                onTyping={setIsTyping} 
+                onSubmit={handleSubmit}
+                voiceMode={isVoiceActive}
+              />
             </div>
 
             

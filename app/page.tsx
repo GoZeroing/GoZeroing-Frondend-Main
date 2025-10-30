@@ -28,6 +28,8 @@ export default function Home() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [history, setHistory] = useState<ChatHistory[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   const audioRefs = useAudioSetup();
   const { voiceState, toggleListening } = useVoiceRecognition(audioRefs);
@@ -37,6 +39,15 @@ export default function Home() {
       toggleListening();
     }
   }, [isTyping, voiceState.isListening, toggleListening]);
+
+  // Simulate connection delay
+  useEffect(() => {
+    const connectionTimer = setTimeout(() => {
+      setIsConnected(true);
+    }, 2000); // 2 second connection delay
+
+    return () => clearTimeout(connectionTimer);
+  }, []);
 
   const handleParticleFieldClick = () => {
     if (!isTyping && !isResponding) {
@@ -112,11 +123,39 @@ export default function Home() {
 
   return (
     <div className="flex h-screen w-screen bg-background overflow-hidden">
+      {/* Go Zeroing Brand Name - Top Left */}
+      <div 
+        className={`fixed top-6 z-40 transition-all duration-300 ease-out ${
+          sidebarExpanded ? 'left-[260px]' : 'left-[88px]'
+        }`}
+      >
+        <h1 className={`${instrumentSerif.className} text-2xl font-bold text-white/90 tracking-wide flex items-center`}>
+          {isConnected ? (
+            <>
+              Go Zeroing
+              <span className="inline-block w-0.5 h-6 bg-white/70 ml-1 animate-pulse"></span>
+            </>
+          ) : (
+            <>
+              Connecting
+              <span className="inline-block w-0.5 h-6 bg-white/70 ml-1 animate-pulse"></span>
+              <div className="flex gap-0.5 ml-2">
+                <div className="w-1 h-1 bg-white/70 rounded-full animate-bounce"></div>
+                <div className="w-1 h-1 bg-white/70 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                <div className="w-1 h-1 bg-white/70 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              </div>
+            </>
+          )}
+        </h1>
+      </div>
+
       <Sidebar 
         onNewChat={handleNewChat}
         onSelectHistory={handleSelectHistory}
         history={history}
         currentChatId={currentChatId || undefined}
+        isExpanded={sidebarExpanded}
+        onExpandedChange={setSidebarExpanded}
       />
 
       <main className="flex-1 flex flex-col overflow-hidden relative pl-[72px]">

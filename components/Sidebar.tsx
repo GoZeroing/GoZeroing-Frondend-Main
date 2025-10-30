@@ -9,11 +9,21 @@ interface SidebarProps {
   onSelectHistory?: (id: string) => void;
   history?: Array<{ id: string; title: string; timestamp: string }>;
   currentChatId?: string;
+  isExpanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
-export default function Sidebar({ onNewChat, onSelectHistory, history = [], currentChatId }: SidebarProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+export default function Sidebar({ onNewChat, onSelectHistory, history = [], currentChatId, isExpanded = false, onExpandedChange }: SidebarProps) {
   const [showHistory, setShowHistory] = useState(false);
+
+  const handleMouseEnter = () => {
+    onExpandedChange?.(true);
+  };
+
+  const handleMouseLeave = () => {
+    onExpandedChange?.(false);
+    setShowHistory(false);
+  };
 
   return (
     <aside 
@@ -51,11 +61,8 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
         {/* Home Button */}
         <button
           onClick={() => setShowHistory(!showHistory)}
-          onMouseEnter={() => setIsExpanded(true)}
-          onMouseLeave={() => {
-            setIsExpanded(false);
-            setShowHistory(false);
-          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           className="w-full flex items-center justify-center gap-2.5 px-2.5 py-2 rounded-md text-gray-400 hover:text-gray-200 hover:bg-[#252525] transition-all duration-200 group"
         >
           <Home className="w-4 h-4 flex-shrink-0" />

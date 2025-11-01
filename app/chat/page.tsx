@@ -213,13 +213,20 @@ This represents a significant step toward artificial general intelligence (AGI),
     const queryElement = document.querySelector('[contenteditable="true"]') as HTMLElement;
     if (queryElement) {
       const newQuery = queryElement.textContent?.trim();
-      if (newQuery && newQuery !== currentMessage?.query) {
+      const originalQuery = currentMessage?.query?.trim();
+
+      // Only submit if there's actual content and it differs from the original
+      if (newQuery && newQuery.length > 0 && newQuery !== originalQuery) {
         setIsEditingQuery(false);
         // Submit the edited query
         handleSubmit(newQuery);
       } else {
-        // If no changes, just exit edit mode
+        // If no changes or empty, just exit edit mode without re-submitting
         setIsEditingQuery(false);
+        // Reset the text content to ensure it matches the original
+        if (currentMessage?.query) {
+          queryElement.textContent = currentMessage.query;
+        }
       }
     }
   }, [currentMessage?.query, handleSubmit]);

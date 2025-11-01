@@ -206,19 +206,15 @@ const Sidebar = memo(function Sidebar({
         <h3 className="text-sm font-medium mb-2">Quick Categories</h3>
         <ul className="space-y-2 text-sm">
           <li className="hover:text-white cursor-pointer flex items-center gap-2">
-            
             Travel & Exploration
           </li>
           <li className="hover:text-white cursor-pointer flex items-center gap-2">
-            
             Academic Research
           </li>
           <li className="hover:text-white cursor-pointer flex items-center gap-2">
-            
             Music & Entertainment
           </li>
           <li className="hover:text-white cursor-pointer flex items-center gap-2">
-            
             Business & Strategy
           </li>
         </ul>
@@ -335,7 +331,6 @@ const Sidebar = memo(function Sidebar({
                 </p>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">
-                    
                     {space.members.toLocaleString()} members
                   </span>
                   <button className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded transition-colors">
@@ -368,7 +363,6 @@ const Sidebar = memo(function Sidebar({
 
       {/* User Info */}
       <div className="flex items-center gap-3 mb-6 p-3 rounded-lg bg-[#1a1a1a]">
-        
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-white text-sm truncate">
             {userProfile.name}
@@ -492,23 +486,13 @@ const Sidebar = memo(function Sidebar({
 
   const handleIconHover = (section: "home" | "discover" | "spaces" | "profile" | "memory") => {
     setHoveredSection(section);
+    setIsExpanded(true);
   };
 
   return (
     <div
       className="fixed left-0 top-0 h-screen z-50 flex"
-      onMouseEnter={(e) => {
-        // Only expand if hovering over navigation buttons (not the plus button)
-        const target = e.target as HTMLElement;
-        const isNavigationButton = target.closest('button')?.textContent?.includes('Home') ||
-                                  target.closest('button')?.textContent?.includes('Discover') ||
-                                  target.closest('button')?.textContent?.includes('Spaces') ||
-                                  target.closest('button')?.textContent?.includes('Memory') ||
-                                  target.closest('button')?.textContent?.includes('Profile');
-        if (isNavigationButton) {
-          setIsExpanded(true);
-        }
-      }}
+      onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
       {/* Compact Sidebar */}
@@ -605,7 +589,7 @@ const Sidebar = memo(function Sidebar({
       {/* Expanded Panel (appears on hover) */}
       <div
         className={`h-full bg-[#1a1a1a] border-r border-[#2a2a2a] transition-all duration-300 overflow-hidden ${
-          isExpanded && (hoveredSection === "home" || hoveredSection === "discover" || hoveredSection === "spaces" || hoveredSection === "memory") ? "w-[240px] opacity-100" : "w-0 opacity-0"
+          isExpanded ? "w-[240px] opacity-100" : "w-0 opacity-0"
         }`}
       >
         {renderExpandedContent()}

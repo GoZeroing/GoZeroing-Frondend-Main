@@ -1,5 +1,3 @@
-// components/PersistentSidebar.tsx
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -60,7 +58,6 @@ export default function PersistentSidebar() {
   };
 
   const handleMemory = () => {
-    // For now, just log - could navigate to a memory page later
     console.log("Memory graph clicked");
   };
 

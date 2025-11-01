@@ -422,7 +422,11 @@ const Sidebar = memo(function Sidebar({
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen z-50 flex">
+    <div
+      className="fixed left-0 top-0 h-screen z-50 flex"
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
+    >
       {/* Compact Sidebar */}
       <aside
         className={`h-full bg-[#1a1a1a] border-r border-[#2a2a2a] transition-all duration-300 ease-out
@@ -461,11 +465,7 @@ const Sidebar = memo(function Sidebar({
         <nav className="flex flex-col items-center w-full space-y-2 px-3">
           {/* Home */}
           <button
-            onMouseEnter={() => {
-              handleIconHover("home");
-              setIsExpanded(true);
-            }}
-            onMouseLeave={() => setIsExpanded(false)}
+            onMouseEnter={() => handleIconHover("home")}
             onClick={onNewChat}
             className="w-full flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-lg transition-all duration-200 text-gray-200 hover:text-white hover:bg-[#252525] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
@@ -475,11 +475,7 @@ const Sidebar = memo(function Sidebar({
 
           {/* Discover */}
           <button
-            onMouseEnter={() => {
-              handleIconHover("discover");
-              setIsExpanded(true);
-            }}
-            onMouseLeave={() => setIsExpanded(false)}
+            onMouseEnter={() => handleIconHover("discover")}
             onClick={onDiscover}
             className="w-full flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-lg transition-all duration-200 text-gray-200 hover:text-white hover:bg-[#252525] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
@@ -489,11 +485,7 @@ const Sidebar = memo(function Sidebar({
 
           {/* Spaces */}
           <button
-            onMouseEnter={() => {
-              handleIconHover("spaces");
-              setIsExpanded(true);
-            }}
-            onMouseLeave={() => setIsExpanded(false)}
+            onMouseEnter={() => handleIconHover("spaces")}
             onClick={onSpaces}
             className="w-full flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-lg transition-all duration-200 text-gray-200 hover:text-white hover:bg-[#252525] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
@@ -518,7 +510,7 @@ const Sidebar = memo(function Sidebar({
       {/* Expanded Panel (appears on hover) */}
       <div
         className={`h-full bg-[#1a1a1a] border-r border-[#2a2a2a] transition-all duration-300 overflow-hidden ${
-          isExpanded ? "w-[240px] opacity-100" : "w-0 opacity-0"
+          isExpanded && (hoveredSection === "home" || hoveredSection === "discover" || hoveredSection === "spaces") ? "w-[240px] opacity-100" : "w-0 opacity-0"
         }`}
       >
         {renderExpandedContent()}

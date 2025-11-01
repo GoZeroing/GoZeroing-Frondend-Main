@@ -112,7 +112,7 @@ export default function TypePanel({ onTyping, onSubmit, responseMode, voiceMode 
     <div className={responseMode ? "" : "w-full mx-auto mt-16"}>
       <motion.div 
         className={`border rounded-3xl p-2 max-w-2xl relative ring-1 gpu-accelerated ${
-          message.trim() ? 'border-[#6a9ea4]/40 ring-[#6a9ea4]/30 animate-typing-glow' : 'border-[#404040] ring-white/30'
+          message.trim() ? 'border-[#6a9ea4]/60 ring-[#6a9ea4]/40 animate-typing-glow' : 'border-[#666666] ring-white/40'
         }`}
         whileHover={{ 
           scale: 1.01,

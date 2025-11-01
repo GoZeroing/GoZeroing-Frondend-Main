@@ -58,7 +58,12 @@ export default function TypePanel({ onTyping, onSubmit, responseMode, voiceMode 
         }}
       >
         <motion.div
-          className="bg-[#1f1f1f]/80 border border-[#404040] rounded-full px-6 py-3 backdrop-blur-sm ring-1 ring-white/10 hover:ring-white/20"
+          className="bg-[#1f1f1f]/80 border border-[#404040] rounded-full px-6 py-3 transition-all duration-200"
+          style={{
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            backgroundColor: 'rgba(31, 31, 31, 0.8)'
+          }}
           whileHover={{ scale: 1.02, borderColor: "rgba(106, 158, 164, 0.4)" }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2 }}

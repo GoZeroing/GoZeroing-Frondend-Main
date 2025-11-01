@@ -264,9 +264,9 @@ export default function Home() {
             {/* Follow-up Box - Below voice text */}
             {isVoiceActivated && (
               <div
-                className="relative z-20 w-full max-w-[750px] px-4 gpu-accelerated transition-all duration-500"
+                className="relative z-20 w-full max-w-[750px] px-4 transition-all duration-500"
                 style={{
-                  transform: `translateY(350px)`,
+                  transform: `translateY(280px)`,
                   opacity: 1,
                   pointerEvents: 'auto'
                 }}

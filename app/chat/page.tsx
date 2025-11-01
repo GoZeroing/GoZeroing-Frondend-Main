@@ -4,7 +4,6 @@ import React, { useState, useEffect, Suspense, useCallback, useMemo } from "reac
 import { Sparkles, Search, Loader2, CloudUpload, Mic, CheckCircle, Copy, Share, RotateCcw, ThumbsUp, Bookmark } from "lucide-react";
 import { Inter } from "next/font/google";
 import { useSearchParams, useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 
 const inter = Inter({
@@ -198,7 +197,6 @@ This represents a significant step toward artificial general intelligence (AGI),
 
   return (
     <div className={`h-screen overflow-y-auto bg-background text-white ${inter.className} custom-scrollbar`}>
-
       <div className="max-w-3xl mx-auto px-6 py-8 pl-[88px] pb-48">
         {/* Query Header */}
         <AnimatePresence mode="wait">

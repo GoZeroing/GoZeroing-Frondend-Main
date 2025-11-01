@@ -64,21 +64,6 @@ export default function TypePanel({ onTyping, onSubmit, responseMode, voiceMode 
           transition={{ duration: 0.2 }}
         >
           <div className="flex items-center justify-between gap-4">
-            {/* Left: Follow-up input */}
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="flex-1 bg-transparent outline-none border-none focus:outline-none focus:border-none focus:ring-0 text-base text-white placeholder:text-gray-500 font-medium"
-              placeholder="Type a follow-up..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-              }}
-            />
-            
             {/* Right: Control switches */}
             <div className="flex items-center gap-3">
               {/* Mute toggle */}

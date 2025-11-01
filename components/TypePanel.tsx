@@ -44,27 +44,52 @@ export default function TypePanel({ onTyping, onSubmit, responseMode, voiceMode 
     }
   };
 
-  // Voice mode: compact follow-up input
+  // Voice mode: compact follow-up input with icons on right
   if (voiceMode) {
     return (
-      <motion.div 
+      <motion.div
         className="w-full mx-auto"
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ 
-          duration: 0.7, 
+        transition={{
+          duration: 0.7,
           delay: 0.3,
           ease: [0.34, 1.56, 0.64, 1]
         }}
       >
-        <motion.div 
+        <motion.div
           className="bg-[#1f1f1f]/80 border border-[#404040] rounded-full px-6 py-3 backdrop-blur-sm ring-1 ring-white/10 hover:ring-white/20"
           whileHover={{ scale: 1.02, borderColor: "rgba(106, 158, 164, 0.4)" }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="flex items-center justify-between gap-4">
-            {/* Right: Control switches */}
+          <div className="flex items-center gap-4">
+            {/* Input field */}
+            <div className="flex-1">
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setMessage(value);
+                  if (value.length === 0 && onTyping) {
+                    onTyping(false);
+                  }
+                }}
+                className="w-full bg-transparent text-base text-white placeholder:text-gray-400 font-medium focus:outline-none"
+                placeholder="Type a follow-up..."
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+                autoComplete="off"
+                spellCheck="false"
+              />
+            </div>
+
+            {/* Right side icons */}
             <div className="flex items-center gap-3">
               {/* Mute toggle */}
               <button
@@ -74,7 +99,7 @@ export default function TypePanel({ onTyping, onSubmit, responseMode, voiceMode 
               >
                 {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </button>
-              
+
               {/* Model selector */}
               <button
                 className="text-white hover:text-gray-300 transition-colors p-2 hover:bg-white/5 rounded-full"
@@ -82,7 +107,7 @@ export default function TypePanel({ onTyping, onSubmit, responseMode, voiceMode 
               >
                 <Brain className="w-5 h-5" />
               </button>
-              
+
               {/* Settings */}
               <button
                 className="text-white hover:text-gray-300 transition-colors p-2 hover:bg-white/5 rounded-full"
@@ -90,12 +115,12 @@ export default function TypePanel({ onTyping, onSubmit, responseMode, voiceMode 
               >
                 <Settings className="w-5 h-5" />
               </button>
-              
+
               {/* Send button */}
               {message.trim() && (
                 <button
                   onClick={handleSubmit}
-                  className="bg-primary hover:bg-primary-hover text-white p-2 rounded-full transition-all duration-200"
+                  className="bg-[#6a9ea4] hover:bg-[#5a8e94] text-white p-2 rounded-full transition-all duration-200"
                 >
                   <Send className="w-4 h-4" />
                 </button>

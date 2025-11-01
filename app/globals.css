@@ -525,6 +525,19 @@ textarea::placeholder {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
+/* Custom text selection color */
+::selection {
+  background-color: rgba(106, 158, 164, 0.3);
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(106, 158, 164, 0.5);
+}
+
+::-moz-selection {
+  background-color: rgba(106, 158, 164, 0.3);
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(106, 158, 164, 0.5);
+}
+
 /* Text shimmer effect */
 @keyframes text-shimmer {
   0% {

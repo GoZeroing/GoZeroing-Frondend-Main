@@ -54,6 +54,7 @@ function ChatContent() {
   const [isRecording, setIsRecording] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isEditingQuery, setIsEditingQuery] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialQuery = searchParams.get("initialMessage");
@@ -189,6 +190,49 @@ This represents a significant step toward artificial general intelligence (AGI),
     // You could save this preference to local storage or send to server
   }, [isLiked]);
 
+  const handleEditQuery = useCallback((e?: React.MouseEvent) => {
+    if (currentMessage?.query && !isEditingQuery) {
+      setIsEditingQuery(true);
+      // Focus the element after a brief delay
+      setTimeout(() => {
+        const queryElement = e?.target as HTMLElement;
+        if (queryElement) {
+          queryElement.focus();
+          // Select all text
+          const range = document.createRange();
+          range.selectNodeContents(queryElement);
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        }
+      }, 100);
+    }
+  }, [currentMessage?.query, isEditingQuery]);
+
+  const handleSaveEditedQuery = useCallback(() => {
+    const queryElement = document.querySelector('[contenteditable="true"]') as HTMLElement;
+    if (queryElement) {
+      const newQuery = queryElement.textContent?.trim();
+      if (newQuery && newQuery !== currentMessage?.query) {
+        setIsEditingQuery(false);
+        // Submit the edited query
+        handleSubmit(newQuery);
+      } else {
+        // If no changes, just exit edit mode
+        setIsEditingQuery(false);
+      }
+    }
+  }, [currentMessage?.query, handleSubmit]);
+
+  const handleCancelEdit = useCallback(() => {
+    const queryElement = document.querySelector('[contenteditable="true"]') as HTMLElement;
+    if (queryElement && currentMessage?.query) {
+      // Reset the text content to original
+      queryElement.textContent = currentMessage.query;
+    }
+    setIsEditingQuery(false);
+  }, [currentMessage?.query]);
+
   const handleBookmark = useCallback(() => {
     setIsBookmarked(!isBookmarked);
     // You could save this to bookmarks
@@ -208,7 +252,22 @@ This represents a significant step toward artificial general intelligence (AGI),
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-3xl font-normal text-gray-100 mb-6">
+            <h1 
+              contentEditable={isEditingQuery}
+              onClick={handleEditQuery}
+              onBlur={handleSaveEditedQuery}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSaveEditedQuery();
+                } else if (e.key === 'Escape') {
+                  handleCancelEdit();
+                }
+              }}
+              className="text-3xl font-normal text-gray-100 mb-6 cursor-pointer hover:text-white transition-colors duration-200 outline-none"
+              title={isEditingQuery ? "Press Enter to save, Escape to cancel" : "Click to edit and resend this question"}
+              suppressContentEditableWarning={true}
+            >
               {currentMessage.query}
             </h1>
 
@@ -460,7 +519,7 @@ This represents a significant step toward artificial general intelligence (AGI),
         {/* Input Area - Enhanced with multiple controls */}
         <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background to-transparent pt-8 pb-6 pl-[72px]">
           <div className="max-w-3xl mx-auto px-6">
-            <div className="relative bg-[#1a1a1a] border border-[#2a2a2a] focus-within:border-[#6a9ea4] rounded-2xl transition-all duration-200 overflow-hidden">
+            <div className="relative bg-[#1a1a1a] border border-[#666666] focus-within:border-[#6a9ea4] rounded-3xl transition-all duration-200 overflow-hidden">
               {/* Main textarea area */}
               <div className="relative">
                 <textarea

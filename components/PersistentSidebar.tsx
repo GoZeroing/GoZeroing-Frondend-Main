@@ -59,6 +59,11 @@ export default function PersistentSidebar() {
     router.push("/profile");
   };
 
+  const handleMemory = () => {
+    // For now, just log - could navigate to a memory page later
+    console.log("Memory graph clicked");
+  };
+
   // Convert actual history to mock format for sidebar
   const sidebarHistory = history.length > 0 
     ? history.map(item => ({
@@ -80,6 +85,7 @@ export default function PersistentSidebar() {
       onDiscover={handleDiscover}
       onSpaces={handleSpaces}
       onProfile={handleProfile}
+      onMemory={handleMemory}
     />
   );
 }

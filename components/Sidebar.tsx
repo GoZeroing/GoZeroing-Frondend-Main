@@ -44,6 +44,19 @@ const ProfileIcon = () => (
   </svg>
 );
 
+const MemoryGraphIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.05"/>
+    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
+    <circle cx="8" cy="8" r="1.5" stroke="currentColor" strokeWidth="1" fill="currentColor" fillOpacity="0.3"/>
+    <circle cx="16" cy="8" r="1.5" stroke="currentColor" strokeWidth="1" fill="currentColor" fillOpacity="0.3"/>
+    <circle cx="8" cy="16" r="1.5" stroke="currentColor" strokeWidth="1" fill="currentColor" fillOpacity="0.3"/>
+    <circle cx="16" cy="16" r="1.5" stroke="currentColor" strokeWidth="1" fill="currentColor" fillOpacity="0.3"/>
+    <path d="M10.5 10.5L13.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M13.5 10.5L10.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
 const TrendingIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M23 6L13.5 15.5L8.5 10.5L1 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -88,12 +101,13 @@ interface SidebarProps {
   onDiscover?: () => void;
   onSpaces?: () => void;
   onProfile?: () => void;
+  onMemory?: () => void;
   history?: ChatHistoryItem[];
   currentChatId?: string;
   isExpanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
-  currentSection?: "home" | "discover" | "spaces" | "profile";
-  setCurrentSection?: (s: "home" | "discover" | "spaces" | "profile") => void;
+  currentSection?: "home" | "discover" | "spaces" | "profile" | "memory";
+  setCurrentSection?: (s: "home" | "discover" | "spaces" | "profile" | "memory") => void;
 }
 
 const Sidebar = memo(function Sidebar({
@@ -104,9 +118,10 @@ const Sidebar = memo(function Sidebar({
   onDiscover,
   onSpaces,
   onProfile,
+  onMemory,
 }: SidebarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [hoveredSection, setHoveredSection] = useState<"home" | "discover" | "spaces" | "profile">("home");
+  const [hoveredSection, setHoveredSection] = useState<"home" | "discover" | "spaces" | "profile" | "memory">("home");
 
   // Dummy data for Discover section
   const discoverItems: DiscoverItem[] = [
@@ -402,6 +417,62 @@ const Sidebar = memo(function Sidebar({
     </div>
   );
 
+  const renderMemoryContent = () => (
+    <div className="p-6 text-gray-200">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold">Memory Graph</h2>
+        <MemoryGraphIcon />
+      </div>
+
+      <div className="space-y-4">
+        <div className="p-4 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
+          <h3 className="font-medium text-white text-sm mb-2">Connection Insights</h3>
+          <p className="text-gray-400 text-xs mb-3">
+            View and analyze your conversation patterns and knowledge connections.
+          </p>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="text-center p-2 bg-[#2a2a2a] rounded">
+              <div className="text-white font-semibold">{history.length}</div>
+              <div className="text-gray-400">Conversations</div>
+            </div>
+            <div className="text-center p-2 bg-[#2a2a2a] rounded">
+              <div className="text-white font-semibold">47</div>
+              <div className="text-gray-400">Topics</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
+          <h3 className="font-medium text-white text-sm mb-2">Recent Connections</h3>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-300">AI Models</span>
+              <span className="text-gray-500">High</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-300">Technology</span>
+              <span className="text-gray-500">Medium</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-300">Science</span>
+              <span className="text-gray-500">Medium</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-[#2a2a2a]">
+        <button
+          onClick={onMemory}
+          className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-[#1f1f1f] hover:bg-[#252525] text-gray-300 hover:text-white transition-colors"
+        >
+          <Zap className="w-4 h-4" />
+          <span className="text-sm">View Full Graph</span>
+        </button>
+      </div>
+    </div>
+  );
+
   const renderExpandedContent = () => {
     switch (hoveredSection) {
       case "home":
@@ -410,6 +481,8 @@ const Sidebar = memo(function Sidebar({
         return renderDiscoverContent();
       case "spaces":
         return renderSpacesContent();
+      case "memory":
+        return renderMemoryContent();
       case "profile":
         return renderProfileContent();
       default:
@@ -417,14 +490,25 @@ const Sidebar = memo(function Sidebar({
     }
   };
 
-  const handleIconHover = (section: "home" | "discover" | "spaces" | "profile") => {
+  const handleIconHover = (section: "home" | "discover" | "spaces" | "profile" | "memory") => {
     setHoveredSection(section);
   };
 
   return (
     <div
       className="fixed left-0 top-0 h-screen z-50 flex"
-      onMouseEnter={() => setIsExpanded(true)}
+      onMouseEnter={(e) => {
+        // Only expand if hovering over navigation buttons (not the plus button)
+        const target = e.target as HTMLElement;
+        const isNavigationButton = target.closest('button')?.textContent?.includes('Home') ||
+                                  target.closest('button')?.textContent?.includes('Discover') ||
+                                  target.closest('button')?.textContent?.includes('Spaces') ||
+                                  target.closest('button')?.textContent?.includes('Memory') ||
+                                  target.closest('button')?.textContent?.includes('Profile');
+        if (isNavigationButton) {
+          setIsExpanded(true);
+        }
+      }}
       onMouseLeave={() => setIsExpanded(false)}
     >
       {/* Compact Sidebar */}
@@ -445,7 +529,6 @@ const Sidebar = memo(function Sidebar({
               e.stopPropagation();
               onNewChat?.();
             }}
-            onMouseEnter={() => handleIconHover("home")}
             className="w-full h-12 flex items-center justify-center rounded-lg
                        bg-[#1f1f1f] hover:bg-[#252525] text-gray-300 hover:text-white
                        transition-all duration-200 border border-[#2a2a2a] hover:border-[#333]
@@ -494,6 +577,18 @@ const Sidebar = memo(function Sidebar({
           </button>
         </nav>
 
+        {/* Memory - positioned between Spaces and Profile */}
+        <div className="w-full px-3 mb-2">
+          <button
+            onMouseEnter={() => handleIconHover("memory")}
+            onClick={onMemory}
+            className="w-full flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-lg transition-all duration-200 text-gray-200 hover:text-white hover:bg-[#252525] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            <MemoryGraphIcon />
+            <span className="text-xs font-medium mt-1">Memory</span>
+          </button>
+        </div>
+
         {/* Profile at bottom */}
         <div className="w-full px-3 mt-auto mb-4">
           <button
@@ -510,7 +605,7 @@ const Sidebar = memo(function Sidebar({
       {/* Expanded Panel (appears on hover) */}
       <div
         className={`h-full bg-[#1a1a1a] border-r border-[#2a2a2a] transition-all duration-300 overflow-hidden ${
-          isExpanded && (hoveredSection === "home" || hoveredSection === "discover" || hoveredSection === "spaces") ? "w-[240px] opacity-100" : "w-0 opacity-0"
+          isExpanded && (hoveredSection === "home" || hoveredSection === "discover" || hoveredSection === "spaces" || hoveredSection === "memory") ? "w-[240px] opacity-100" : "w-0 opacity-0"
         }`}
       >
         {renderExpandedContent()}

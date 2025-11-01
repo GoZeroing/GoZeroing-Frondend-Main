@@ -18,7 +18,7 @@ const instrumentSerif = Instrument_Serif({
 
 function VoiceContent() {
   const [aiText, setAiText] = useState("");
-  const [autoStarted, setAutoStarted] = useState(false);
+  const [isVoiceActivated, setIsVoiceActivated] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -30,18 +30,13 @@ function VoiceContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const fromHome = searchParams.get("autoStart") === "true";
-
-  // Auto-start listening when coming from home page
+  // Hide voice URL until activated
   useEffect(() => {
-    if (fromHome && !autoStarted && !voiceState.isListening) {
-      const timer = setTimeout(() => {
-        toggleListening();
-        setAutoStarted(true);
-      }, 300);
-      return () => clearTimeout(timer);
+    // Replace URL to hide voice path initially
+    if (typeof window !== 'undefined' && !isVoiceActivated) {
+      window.history.replaceState({}, '', '/');
     }
-  }, [fromHome, autoStarted, voiceState.isListening, toggleListening]);
+  }, [isVoiceActivated]);
 
   // Handle ESC key to go home
   useEffect(() => {
@@ -81,8 +76,15 @@ function VoiceContent() {
     }
   };
 
-  // FIX 2: Toggle listening when clicking orb (stay on voice page)
+  // Toggle listening when clicking orb and activate voice thread
   const handleOrbClick = () => {
+    if (!isVoiceActivated) {
+      // First time activation - update URL to show voice
+      setIsVoiceActivated(true);
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/voice');
+      }
+    }
     toggleListening();
   };
 
@@ -242,7 +244,9 @@ function VoiceContent() {
                     className="absolute inset-0 flex items-center justify-center pointer-events-none"
                   >
                     <div className="bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 premium-blur premium-border transition-all duration-300">
-                      <p className="text-white text-sm font-medium">Click orb to return home</p>
+                      <p className="text-white text-sm font-medium">
+                        {isVoiceActivated ? "Click to toggle voice" : "Click to activate voice"}
+                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -281,7 +285,7 @@ function VoiceContent() {
                       value={voiceMessage}
                       onChange={(e) => setVoiceMessage(e.target.value)}
                       className="w-full bg-transparent text-base text-white placeholder:text-gray-400 font-medium focus:outline-none"
-                      placeholder="Type a follow-up..."
+                      placeholder={isVoiceActivated ? "Type a follow-up..." : "Click orb to activate voice or type here..."}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();

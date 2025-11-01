@@ -106,15 +106,6 @@ button, a {
   transition: all 0.2s ease-in-out;
 }
 
-/* Animation delays */
-.delay-75 {
-  animation-delay: 75ms;
-}
-
-.delay-150 {
-  animation-delay: 150ms;
-}
-
 /* Focus styles */
 button:focus-visible,
 input:focus-visible,

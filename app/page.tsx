@@ -4,13 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from "@/components/Sidebar";
 import TypePanel from "@/components/TypePanel";
 import ParticleField from "@/components/ParticleField";
-import { VoiceTranscript } from "@/components/VoiceTranscript";
-import { ConversationThread } from "@/components/ConversationThread";
-import { ConversationIndicator } from "@/components/ConversationIndicator";
 import { useAudioSetup } from "@/hooks/useAudioSetup";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
-import { useAIChat } from "@/hooks/useAIChat";
-import { useAISpeech } from "@/hooks/useAISpeech";
 import { Instrument_Serif } from "next/font/google";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -31,21 +26,10 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
-  const [aiText, setAiText] = useState("");
-  const [currentUserQuery, setCurrentUserQuery] = useState("");
-  const [isInConversation, setIsInConversation] = useState(false);
   const router = useRouter();
 
   const audioRefs = useAudioSetup();
-  const { voiceState, setVoiceState, toggleListening } = useVoiceRecognition(audioRefs);
-  const { messages, isProcessing, sendMessage } = useAIChat();
-  const { simulateAISpeech } = useAISpeech(
-    voiceState,
-    setVoiceState,
-    setAiText,
-    () => {},
-    audioRefs
-  );
+  const { voiceState, toggleListening } = useVoiceRecognition(audioRefs);
 
   // Reset all states to clean initial values on mount
   useEffect(() => {
@@ -76,7 +60,7 @@ export default function Home() {
   }, []); // Empty dependency array ensures it only runs once
 
   const handleParticleFieldClick = () => {
-    if (!isTyping && !voiceState.isSpeaking) {
+    if (!isTyping) {
       if (!voiceState.isListening) {
         toggleListening();
         setIsVoiceActive(true);
@@ -88,60 +72,13 @@ export default function Home() {
   };
 
   const handleSubmit = async (message: string) => {
-    if (!message.trim()) return;
-    
-    // Start conversation mode
-    setIsInConversation(true);
-    setCurrentUserQuery(message);
-    setIsVoiceActive(false);
-    
-    // Stop listening if active
-    if (voiceState.isListening) {
-      toggleListening();
-    }
-    
-    // Send message to AI chat
-    await sendMessage(message);
-    
-    // Clear query and show AI response after processing
-    setTimeout(() => {
-      setCurrentUserQuery("");
-    }, 1500);
+    // Navigate with Next.js router for smooth client-side transition
+    router.push(`/chat?initialMessage=${encodeURIComponent(message)}`);
   };
-
-  // Update AI text display when new message arrives
-  useEffect(() => {
-    if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.role === 'assistant' && lastMessage.content) {
-        // Set the AI text from the actual message
-        setAiText(lastMessage.content);
-        
-        // Trigger speaking animation
-        setVoiceState(prev => ({ ...prev, isSpeaking: true }));
-        
-        // Clear after speaking duration
-        setTimeout(() => {
-          setVoiceState(prev => ({ ...prev, isSpeaking: false }));
-        }, 5000);
-        
-        // Clear text after display
-        setTimeout(() => {
-          setAiText("");
-        }, 8000);
-      }
-    }
-  }, [messages, setVoiceState]);
 
 
   return (
     <div className="flex h-screen w-screen bg-[#1a1a1a] overflow-hidden">
-      {/* Conversation Indicator */}
-      <ConversationIndicator 
-        isActive={isInConversation}
-        messageCount={messages.length}
-      />
-
       {/* Go Zeroing Brand Name - Top Left */}
       <div className="fixed top-6 left-[88px] z-40">
         <h1 className={`${instrumentSerif.className} text-2xl font-bold text-white/90 tracking-wide flex items-center`}>
@@ -198,15 +135,8 @@ export default function Home() {
               frequency={voiceState.frequency}
             />
             
-            {/* Voice Transcript - AI Response Display */}
-            <VoiceTranscript 
-              text={aiText}
-              isAISpeaking={voiceState.isSpeaking}
-              userQuery={currentUserQuery}
-            />
-            
             {/* Orb Click Area - Circular region over the orb */}
-            {!isTyping && !voiceState.isSpeaking && (
+            {!isTyping && (
               <div 
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full cursor-pointer z-10 hover:scale-110 transition-transform"
                 onClick={handleParticleFieldClick}
@@ -217,7 +147,7 @@ export default function Home() {
               />
             )}
             
-            {!isTyping && !isInConversation && !voiceState.isListening && (
+            {!isTyping && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 premium-blur premium-border opacity-0 hover:opacity-100 transition-all duration-300">
                   <p className="text-white text-sm font-medium">Click to start voice session</p>
@@ -235,47 +165,34 @@ export default function Home() {
           >
             
             {/* Voice Active Message */}
-            {(isVoiceActive || (isInConversation && voiceState.isListening)) && (
-              <motion.div 
-                className="text-center mb-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
+            {isVoiceActive && (
+              <div className="text-center mb-8">
                 <p className="text-gray-400 text-lg font-medium animate-pulse">
                   Listening...
                 </p>
                 <p className="text-gray-500 text-sm mt-2">
                   Speak your question
                 </p>
-              </motion.div>
+              </div>
             )}
 
             <div 
               className="relative z-20 w-full max-w-[750px] px-4 gpu-accelerated transition-all duration-500"
               style={{
-                transform: `translateY(${isVoiceActive || isInConversation ? 256 : -64}px)`,
+                transform: `translateY(${isVoiceActive ? 256 : -64}px)`,
                 opacity: 1
               }}
             >
               <TypePanel 
                 onTyping={setIsTyping} 
                 onSubmit={handleSubmit}
-                voiceMode={isVoiceActive || isInConversation}
+                voiceMode={isVoiceActive}
               />
             </div>
 
             
           </div>
         </div>
-
-        {/* Conversation Thread - Message History */}
-        <ConversationThread 
-          messages={messages}
-          isProcessing={isProcessing}
-          isVisible={isInConversation && messages.length > 0}
-        />
       </main>
     </div>
   );

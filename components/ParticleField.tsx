@@ -236,7 +236,7 @@ function SynapticLines({ isListening, frequency, isSpeaking }: ParticleFieldProp
   );
 }
 
-export default function   (props: ParticleFieldProps) {
+export default function ParticleField(props: ParticleFieldProps) {
   return (
     <div className="absolute top-0 left-0 w-full h-full z-1 pointer-events-none">
       <Canvas camera={{ position: [0, 0, 20], fov: 75 }} gl={{ antialias: true, alpha: true }}>

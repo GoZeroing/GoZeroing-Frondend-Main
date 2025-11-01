@@ -11,4 +11,5 @@ export const theme = {
     'bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent',
   buttonPrimary: 'bg-white text-gray-900 hover:bg-gray-100',
   borderColor: 'border-gray-700/50',
+  primary: '#354f52',
 };

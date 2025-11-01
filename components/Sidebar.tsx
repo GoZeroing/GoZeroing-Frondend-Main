@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { Home, Plus, Clock, ChevronRight, User } from "lucide-react";
 import Logo from "./Logo";
 
@@ -13,7 +13,7 @@ interface SidebarProps {
   onExpandedChange?: (expanded: boolean) => void;
 }
 
-export default function Sidebar({ onNewChat, onSelectHistory, history = [], currentChatId, isExpanded = false, onExpandedChange }: SidebarProps) {
+const Sidebar = memo(function Sidebar({ onNewChat, onSelectHistory, history = [], currentChatId, isExpanded = false, onExpandedChange }: SidebarProps) {
   const [showHistory, setShowHistory] = useState(false);
 
   const handleMouseEnter = () => {
@@ -114,4 +114,6 @@ export default function Sidebar({ onNewChat, onSelectHistory, history = [], curr
       </div>
     </aside>
   );
-}
+});
+
+export default Sidebar;

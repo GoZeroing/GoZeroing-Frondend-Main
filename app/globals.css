@@ -57,28 +57,62 @@ html, body, #__next {
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Custom scrollbar - hidden by default, visible on scroll/hover */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
 }
 
-::-webkit-scrollbar-track {
-  background: #1a1a1a;
+.custom-scrollbar:hover {
+  scrollbar-color: #3a3a3a transparent;
 }
 
-::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar {
+  opacity: 1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
   background: #3a3a3a;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #4a4a4a;
+}
+
+/* Firefox scrollbar styling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.custom-scrollbar:hover {
+  scrollbar-color: #3a3a3a transparent;
 }
 
 /* Smooth transitions */
 button, a {
   transition: all 0.2s ease-in-out;
+}
+
+/* Animation delays */
+.delay-75 {
+  animation-delay: 75ms;
+}
+
+.delay-150 {
+  animation-delay: 150ms;
 }
 
 /* Focus styles */
@@ -128,4 +162,398 @@ textarea:focus-visible {
 textarea::placeholder {
   color: #6b7280;
   opacity: 1;
+}
+
+/* Perplexity-style animations */
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress-bar {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce-dot {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-cursor {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 2s linear infinite;
+}
+
+.animate-progress-bar {
+  animation: progress-bar 2s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+.animate-bounce-dot {
+  animation: bounce-dot 1.4s ease-in-out infinite;
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.4s ease-out forwards;
+}
+
+.animate-pulse-cursor {
+  animation: pulse-cursor 1s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+/* Premium Animations for OpenAI/Perplexity-level Quality */
+
+/* Morphing panel animation when submitting */
+@keyframes morph-and-ascend {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    border-radius: 24px;
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-20px) scale(0.98);
+  }
+  60% {
+    opacity: 0.7;
+    transform: translateY(-80px) scale(0.92);
+    border-radius: 16px;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-150px) scale(0.85);
+    border-radius: 12px;
+  }
+}
+
+/* Text dissolve effect */
+@keyframes text-dissolve {
+  0% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(-30px);
+  }
+}
+
+/* Particle scatter effect */
+@keyframes particle-scatter {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-100px);
+  }
+}
+
+/* Premium entrance from top */
+@keyframes premium-entrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%) scale(0.9);
+    filter: blur(10px);
+  }
+  50% {
+    opacity: 0.5;
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+/* Glow pulse effect */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(106, 158, 164, 0.3),
+                0 0 40px rgba(106, 158, 164, 0.2),
+                0 0 60px rgba(106, 158, 164, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(106, 158, 164, 0.5),
+                0 0 60px rgba(106, 158, 164, 0.3),
+                0 0 90px rgba(106, 158, 164, 0.2);
+  }
+}
+
+/* Typing indicator animation */
+@keyframes typing-glow {
+  0%, 100% {
+    border-color: rgba(106, 158, 164, 0.3);
+  }
+  50% {
+    border-color: rgba(106, 158, 164, 0.8);
+  }
+}
+
+/* Smooth scale with glow */
+@keyframes scale-glow {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Page transition fade */
+@keyframes page-transition {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Elastic entrance */
+@keyframes elastic-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(50px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateY(-5px);
+  }
+  75% {
+    transform: scale(0.98) translateY(2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Shimmer effect for loading */
+@keyframes shimmer-slide {
+  0% {
+    transform: translateX(-100%) translateY(-50%);
+  }
+  100% {
+    transform: translateX(200%) translateY(-50%);
+  }
+}
+
+/* Breath animation */
+@keyframes breath {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+/* Ripple effect */
+@keyframes ripple {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Utility classes for animations */
+.animate-morph-ascend {
+  animation: morph-and-ascend 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-text-dissolve {
+  animation: text-dissolve 0.6s ease-out forwards;
+}
+
+.animate-particle-scatter {
+  animation: particle-scatter 1s ease-out forwards;
+}
+
+.animate-premium-entrance {
+  animation: premium-entrance 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-typing-glow {
+  animation: typing-glow 2s ease-in-out infinite;
+}
+
+.animate-scale-glow {
+  animation: scale-glow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-page-transition {
+  animation: page-transition 0.4s ease-out forwards;
+}
+
+.animate-elastic-entrance {
+  animation: elastic-entrance 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.animate-shimmer-slide {
+  animation: shimmer-slide 2s ease-in-out infinite;
+}
+
+.animate-breath {
+  animation: breath 3s ease-in-out infinite;
+}
+
+.animate-ripple {
+  animation: ripple 0.6s ease-out forwards;
+}
+
+/* Performance optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Premium gradient backgrounds */
+.premium-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(106, 158, 164, 0.1) 0%,
+    rgba(52, 79, 82, 0.05) 50%,
+    rgba(26, 26, 26, 0.1) 100%
+  );
+}
+
+.premium-border {
+  border: 1px solid rgba(106, 158, 164, 0.2);
+  box-shadow: 0 0 20px rgba(106, 158, 164, 0.1),
+              inset 0 0 20px rgba(106, 158, 164, 0.05);
+}
+
+/* Backdrop blur enhancements */
+.premium-blur {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Text shimmer effect */
+@keyframes text-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 3s linear infinite;
 }

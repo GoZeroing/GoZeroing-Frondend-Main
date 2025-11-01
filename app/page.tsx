@@ -4,9 +4,16 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from "@/components/Sidebar";
 import TypePanel from "@/components/TypePanel";
 import ParticleField from "@/components/ParticleField";
+import { VoiceTranscript } from "@/components/VoiceTranscript";
+import { ConversationThread } from "@/components/ConversationThread";
+import { ConversationIndicator } from "@/components/ConversationIndicator";
 import { useAudioSetup } from "@/hooks/useAudioSetup";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
+import { useAIChat } from "@/hooks/useAIChat";
+import { useAISpeech } from "@/hooks/useAISpeech";
 import { Instrument_Serif } from "next/font/google";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
@@ -22,18 +29,36 @@ interface ChatHistory {
 
 export default function Home() {
   const [isTyping, setIsTyping] = useState(false);
-  const [isResponding, setIsResponding] = useState(false);
-  const [userQuery, setUserQuery] = useState('');
-  const [aiResponse, setAiResponse] = useState('');
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [history, setHistory] = useState<ChatHistory[]>([]);
-  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
+  const [aiText, setAiText] = useState("");
+  const [currentUserQuery, setCurrentUserQuery] = useState("");
+  const [isInConversation, setIsInConversation] = useState(false);
+  const router = useRouter();
 
   const audioRefs = useAudioSetup();
-  const { voiceState, toggleListening } = useVoiceRecognition(audioRefs);
+  const { voiceState, setVoiceState, toggleListening } = useVoiceRecognition(audioRefs);
+  const { messages, isProcessing, sendMessage } = useAIChat();
+  const { simulateAISpeech } = useAISpeech(
+    voiceState,
+    setVoiceState,
+    setAiText,
+    () => {},
+    audioRefs
+  );
+
+  // Reset all states to clean initial values on mount
+  useEffect(() => {
+    setIsTyping(false);
+    setIsVoiceActive(false);
+    setIsConnected(false); // Reset connection state
+
+    // Cleanup function to reset states on unmount
+    return () => {
+      setIsTyping(false);
+      setIsVoiceActive(false);
+    };
+  }, []);
 
   useEffect(() => {
     if (isTyping && voiceState.isListening) {
@@ -41,17 +66,17 @@ export default function Home() {
     }
   }, [isTyping, voiceState.isListening, toggleListening]);
 
-  // Simulate connection delay
+  // Simulate connection delay - only run once after reset
   useEffect(() => {
     const connectionTimer = setTimeout(() => {
       setIsConnected(true);
-    }, 2000); // 2 second connection delay
+    }, 1500); // Reduced to 1.5 seconds for better UX
 
     return () => clearTimeout(connectionTimer);
-  }, []);
+  }, []); // Empty dependency array ensures it only runs once
 
   const handleParticleFieldClick = () => {
-    if (!isTyping && !isResponding) {
+    if (!isTyping && !voiceState.isSpeaking) {
       if (!voiceState.isListening) {
         toggleListening();
         setIsVoiceActive(true);
@@ -60,167 +85,111 @@ export default function Home() {
         setIsVoiceActive(false);
       }
     }
-  }
+  };
 
   const handleSubmit = async (message: string) => {
-    const chatId = currentChatId || `chat-${Date.now()}`;
-    setCurrentChatId(chatId);
-    setUserQuery(message);
-    setIsResponding(true);
-    setIsStreaming(true);
-    setAiResponse('');
-    setIsVoiceActive(false); // Reset voice active state
-
-    // Simulate AI streaming response
-    const fullResponse = "I understand your question. Let me analyze this carefully. Based on the information available, here's what I can tell you: This is a comprehensive response that demonstrates the streaming capability similar to Perplexity AI. The system processes your query, searches through relevant information, and provides a detailed, thoughtful answer in real-time. This creates an engaging user experience where you can see the AI 'thinking' and formulating its response progressively.";
+    if (!message.trim()) return;
     
-    let currentIndex = 0;
-    const streamInterval = setInterval(() => {
-      if (currentIndex < fullResponse.length) {
-        const currentResponse = fullResponse.slice(0, currentIndex + 1);
-        setAiResponse(currentResponse);
-        currentIndex++;
-      } else {
-        setIsStreaming(false);
-        clearInterval(streamInterval);
-        
-        // Save to history
-        const newHistoryItem: ChatHistory = {
-          id: chatId,
-          title: message.slice(0, 50) + (message.length > 50 ? '...' : ''),
-          timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-          query: message,
-          response: fullResponse
-        };
-        
-        setHistory(prev => {
-          const existingIndex = prev.findIndex(item => item.id === chatId);
-          if (existingIndex >= 0) {
-            const updated = [...prev];
-            updated[existingIndex] = newHistoryItem;
-            return updated;
-          }
-          return [newHistoryItem, ...prev];
-        });
-      }
-    }, 20);
-  };
-
-  const handleNewChat = () => {
-    setIsResponding(false);
-    setUserQuery('');
-    setAiResponse('');
-    setIsStreaming(false);
-    setCurrentChatId(null);
-  };
-
-  const handleSelectHistory = (id: string) => {
-    const chat = history.find(item => item.id === id);
-    if (chat) {
-      setCurrentChatId(id);
-      setUserQuery(chat.query);
-      setAiResponse(chat.response);
-      setIsResponding(true);
-      setIsStreaming(false);
+    // Start conversation mode
+    setIsInConversation(true);
+    setCurrentUserQuery(message);
+    setIsVoiceActive(false);
+    
+    // Stop listening if active
+    if (voiceState.isListening) {
+      toggleListening();
     }
+    
+    // Send message to AI chat
+    await sendMessage(message);
+    
+    // Clear query and show AI response after processing
+    setTimeout(() => {
+      setCurrentUserQuery("");
+    }, 1500);
   };
+
+  // Update AI text display when new message arrives
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === 'assistant' && lastMessage.content) {
+        // Set the AI text from the actual message
+        setAiText(lastMessage.content);
+        
+        // Trigger speaking animation
+        setVoiceState(prev => ({ ...prev, isSpeaking: true }));
+        
+        // Clear after speaking duration
+        setTimeout(() => {
+          setVoiceState(prev => ({ ...prev, isSpeaking: false }));
+        }, 5000);
+        
+        // Clear text after display
+        setTimeout(() => {
+          setAiText("");
+        }, 8000);
+      }
+    }
+  }, [messages, setVoiceState]);
+
 
   return (
-    <div className="flex h-screen w-screen bg-background overflow-hidden">
+    <div className="flex h-screen w-screen bg-[#1a1a1a] overflow-hidden">
+      {/* Conversation Indicator */}
+      <ConversationIndicator 
+        isActive={isInConversation}
+        messageCount={messages.length}
+      />
+
       {/* Go Zeroing Brand Name - Top Left */}
-      <div 
-        className={`fixed top-6 z-40 transition-all duration-300 ease-out ${
-          sidebarExpanded ? 'left-[260px]' : 'left-[88px]'
-        }`}
-      >
+      <div className="fixed top-6 left-[88px] z-40">
         <h1 className={`${instrumentSerif.className} text-2xl font-bold text-white/90 tracking-wide flex items-center`}>
+          <AnimatePresence mode="wait">
           {isConnected ? (
-            <>
+            <motion.span
+              key="connected"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-center"
+            >
               Go Zeroing
-              {voiceState.isListening && <span className="inline-block w-0.5 h-6 bg-white/70 ml-1 animate-pulse"></span>}
-            </>
+              {voiceState.isListening && (
+                <span 
+                  className="inline-block w-0.5 h-6 bg-white/70 ml-1 animate-pulse"
+                />
+              )}
+            </motion.span>
           ) : (
-            <>
+            <motion.span
+              key="connecting"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-center"
+            >
               Connecting
-              <span className="inline-block w-0.5 h-6 bg-white/70 ml-1 animate-pulse"></span>
-              <div className="flex gap-0.5 ml-2">
-                <div className="w-1 h-1 bg-white/70 rounded-full animate-bounce"></div>
-                <div className="w-1 h-1 bg-white/70 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                <div className="w-1 h-1 bg-white/70 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-              </div>
-            </>
+              <span 
+                className="inline-block w-0.5 h-6 bg-white/70 ml-1 animate-pulse"
+              />
+            </motion.span>
           )}
+          </AnimatePresence>
         </h1>
       </div>
 
-      <Sidebar 
-        onNewChat={handleNewChat}
-        onSelectHistory={handleSelectHistory}
-        history={history}
-        currentChatId={currentChatId || undefined}
-        isExpanded={sidebarExpanded}
-        onExpandedChange={setSidebarExpanded}
-      />
-
       <main className="flex-1 flex flex-col overflow-hidden relative pl-[72px]">
-        {/* AI Response View */}
-        {isResponding && (
-          <div className="absolute inset-0 z-30 bg-background flex flex-col animate-in fade-in duration-500">
-            <div className="flex-1 overflow-y-auto px-8 py-8">
-              <div className="max-w-[800px] mx-auto space-y-6">
-                {/* User Query */}
-                <div className="animate-in slide-in-from-bottom-4 duration-500">
-                  <div className="text-gray-400 text-sm mb-2 font-medium">Your Question</div>
-                  <div className="text-white text-xl font-sans font-medium leading-relaxed">
-                    {userQuery}
-                  </div>
-                </div>
-
-                {/* AI Response */}
-                <div className="animate-in slide-in-from-bottom-4 duration-700 delay-200">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="relative">
-                        <div className="text-gray-400 text-sm font-medium">Zeroing</div>
-                        {isStreaming && (
-                          <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse">
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-[shimmer_2s_ease-in-out_infinite]"></div>
-                          </div>
-                        )}
-                      </div>
-                      {isStreaming && (
-                        <div className="flex gap-1">
-                          <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
-                          <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                          <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-gray-300 text-base font-sans leading-relaxed whitespace-pre-wrap">
-                    {aiResponse}
-                    {isStreaming && <span className="inline-block w-2 h-5 bg-gray-400 ml-1 animate-pulse"></span>}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Input */}
-            <div className="bg-background/95 backdrop-blur-sm animate-in slide-in-from-bottom duration-500 delay-300">
-              <div className="max-w-[900px] mx-auto px-8 py-4">
-                <TypePanel onTyping={setIsTyping} onSubmit={handleSubmit} responseMode={true} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className={`flex-1 flex flex-col z-10 ${isResponding ? 'opacity-0 pointer-events-none scale-95' : 'opacity-100 scale-100'}`}>
-          <div 
-            className={`relative w-full ${
-              isTyping 
-                ? 'absolute inset-0 pointer-events-none' 
-                : 'h-[400px] hover:opacity-90'
-            }`}
+        <div className="flex-1 flex flex-col">
+          <div className={`relative w-full gpu-accelerated transition-all duration-500`}
+            style={{ 
+              height: isTyping ? '100%' : '400px',
+              opacity: isTyping ? 0.3 : 1,
+              transform: isTyping ? 'scale(1.1)' : 'scale(1)',
+              pointerEvents: isTyping ? 'none' : 'auto'
+            }}
           >
             <ParticleField
               isListening={voiceState.isListening}
@@ -229,10 +198,17 @@ export default function Home() {
               frequency={voiceState.frequency}
             />
             
+            {/* Voice Transcript - AI Response Display */}
+            <VoiceTranscript 
+              text={aiText}
+              isAISpeaking={voiceState.isSpeaking}
+              userQuery={currentUserQuery}
+            />
+            
             {/* Orb Click Area - Circular region over the orb */}
-            {!isTyping && (
+            {!isTyping && !voiceState.isSpeaking && (
               <div 
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full cursor-pointer z-10"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full cursor-pointer z-10 hover:scale-110 transition-transform"
                 onClick={handleParticleFieldClick}
                 style={{ 
                   background: 'transparent',
@@ -241,9 +217,9 @@ export default function Home() {
               />
             )}
             
-            {!isTyping && (
+            {!isTyping && !isInConversation && !voiceState.isListening && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                <div className="bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 premium-blur premium-border opacity-0 hover:opacity-100 transition-all duration-300">
                   <p className="text-white text-sm font-medium">Click to start voice session</p>
                 </div>
               </div>
@@ -251,46 +227,55 @@ export default function Home() {
           </div>
 
           <div 
-            className={`flex-1 flex flex-col items-center ${
-              isTyping ? 'justify-center relative z-20' : 'justify-start pt-4'
-            }`}
+            className="flex-1 flex flex-col items-center relative z-20"
             style={{
-              transition: 'all 1.2s cubic-bezier(0.4, 0, 0.2, 1)'
+              justifyContent: 'flex-start',
+              paddingTop: 16
             }}
           >
             
             {/* Voice Active Message */}
-            {isVoiceActive && !isResponding && (
-              <div 
+            {(isVoiceActive || (isInConversation && voiceState.isListening)) && (
+              <motion.div 
                 className="text-center mb-8"
-                style={{
-                  animation: 'fadeInSlideDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both'
-                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
               >
-                <p className="text-gray-400 text-lg font-medium">Listening...</p>
-                <p className="text-gray-500 text-sm mt-2">Speak your question</p>
-              </div>
+                <p className="text-gray-400 text-lg font-medium animate-pulse">
+                  Listening...
+                </p>
+                <p className="text-gray-500 text-sm mt-2">
+                  Speak your question
+                </p>
+              </motion.div>
             )}
 
             <div 
-              className={`relative z-20 w-full max-w-[750px] px-4 ${
-                isVoiceActive ? 'translate-y-64' : '-mt-16'
-              }`}
+              className="relative z-20 w-full max-w-[750px] px-4 gpu-accelerated transition-all duration-500"
               style={{
-                transition: 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                transitionDelay: isVoiceActive ? '0.1s' : '0s'
+                transform: `translateY(${isVoiceActive || isInConversation ? 256 : -64}px)`,
+                opacity: 1
               }}
             >
               <TypePanel 
                 onTyping={setIsTyping} 
                 onSubmit={handleSubmit}
-                voiceMode={isVoiceActive}
+                voiceMode={isVoiceActive || isInConversation}
               />
             </div>
 
             
           </div>
         </div>
+
+        {/* Conversation Thread - Message History */}
+        <ConversationThread 
+          messages={messages}
+          isProcessing={isProcessing}
+          isVisible={isInConversation && messages.length > 0}
+        />
       </main>
     </div>
   );
